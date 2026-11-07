@@ -18,7 +18,6 @@ h1{font-size:clamp(28px,5vw,44px);line-height:1.1;margin:0 0 10px;font-weight:60
 .tabs button{background:none;border:0;color:var(--dim);font:inherit;padding:8px 16px;border-radius:7px;cursor:pointer}
 .tabs button[aria-selected=true]{background:var(--gold);color:#1b1608;font-weight:600}
 input[type=search]{background:var(--panel);border:1px solid var(--line);color:var(--text);font:inherit;padding:9px 12px;border-radius:8px;min-width:220px}
-label{color:var(--dim);display:flex;gap:6px;align-items:center}
 :focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .wrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--panel);margin-bottom:20px}
 table{border-collapse:collapse;width:100%;min-width:720px}
@@ -46,7 +45,6 @@ footer{color:var(--dim);font-size:13px;margin-top:32px;border-top:1px solid var(
     <button role="tab" data-t="funds" aria-selected="false">Fundusze 13F</button>
   </div>
   <input type="search" id="q" placeholder="Szukaj spółki lub osoby" aria-label="Szukaj">
-  <label id="wl"><input type="checkbox" id="w"> Tylko moja lista</label>
 </div>
 <p class="note" id="upd"></p>
 <div id="out"></div>
@@ -87,11 +85,10 @@ function funds(q){
 
 function render(){
   if(!D) return;
-  const q=$("#q").value.trim().toLowerCase(), w=$("#w").checked;
-  $("#wl").style.display=tab==="politicians"?"flex":"none";
-  if(tab==="funds"){ $("#out").innerHTML=funds(q); return; }
+  const q=$("#q").value.trim().toLowerCase();
+    if(tab==="funds"){ $("#out").innerHTML=funds(q); return; }
   const v=views[tab];
-  const rows=D[tab].filter(r=>(!q||v.text(r).toLowerCase().includes(q))&&(!w||v.hl(r)));
+  const rows=D[tab].filter(r=>(!q||v.text(r).toLowerCase().includes(q)));
   $("#out").innerHTML=table(v,rows);
 }
 
@@ -100,7 +97,7 @@ document.querySelectorAll("[role=tab]").forEach(b=>b.onclick=()=>{
   document.querySelectorAll("[role=tab]").forEach(x=>x.setAttribute("aria-selected",x===b));
   render();
 });
-$("#q").oninput=render; $("#w").onchange=render;
+$("#q").oninput=render;
 
 fetch("data.json").then(r=>r.json()).then(d=>{
   D=d; $("#upd").textContent="Ostatnia aktualizacja: "+new Date(d.updated).toLocaleString("pl-PL"); render();
