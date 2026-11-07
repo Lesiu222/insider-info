@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Insider Info</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#141a26;--panel:#1b2333;--line:#2b3550;--text:#ebe6d8;--dim:#98a0b3;--buy:#7cc79c;--sell:#e8826f;--gold:#e2b44f}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 "IBM Plex Sans",system-ui,sans-serif}
+main{max-width:1100px;margin:0 auto;padding:40px 20px 60px}
+h1{font-size:clamp(28px,5vw,44px);line-height:1.1;margin:0 0 10px;font-weight:600;letter-spacing:-.02em}
+.sub{color:var(--dim);max-width:60ch;margin:0 0 28px}
+.bar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:16px}
+.tabs{display:flex;gap:4px;background:var(--panel);padding:4px;border-radius:10px}
+.tabs button{background:none;border:0;color:var(--dim);font:inherit;padding:8px 16px;border-radius:7px;cursor:pointer}
+.tabs button[aria-selected=true]{background:var(--gold);color:#1b1608;font-weight:600}
+input[type=search]{background:var(--panel);border:1px solid var(--line);color:var(--text);font:inherit;padding:9px 12px;border-radius:8px;min-width:220px}
+label{color:var(--dim);display:flex;gap:6px;align-items:center}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.wrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--panel);margin-bottom:20px}
+table{border-collapse:collapse;width:100%;min-width:720px}
+th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+th{color:var(--dim);font-weight:500;font-size:13px}
+tr:last-child td{border-bottom:0}
+td.n{text-align:right;font-variant-numeric:tabular-nums}
+.buy{color:var(--buy);font-weight:600}.sell{color:var(--sell);font-weight:600}
+.hl td:first-child{box-shadow:inset 3px 0 var(--gold)}
+a{color:var(--gold)}
+.note{color:var(--dim);font-size:13px}
+h2{font-size:18px;margin:24px 0 4px}
+.empty{padding:30px;color:var(--dim)}
+footer{color:var(--dim);font-size:13px;margin-top:32px;border-top:1px solid var(--line);padding-top:16px}
+</style>
+</head>
+<body>
+<main>
+<h1>Insider Info</h1>
+<p class="sub">Jawne transakcje insiderów, funduszy i polityków z USA w jednym miejscu. Dane pochodzą z SEC i oficjalnych zgłoszeń Kongresu.</p>
+<div class="bar">
+  <div class="tabs" role="tablist">
+    <button role="tab" data-t="politicians" aria-selected="true">Politycy</button>
+    <button role="tab" data-t="insiders" aria-selected="false">Insiderzy spółek</button>
+    <button role="tab" data-t="funds" aria-selected="false">Fundusze 13F</button>
+  </div>
+  <input type="search" id="q" placeholder="Szukaj spółki lub osoby" aria-label="Szukaj">
+  <label id="wl"><input type="checkbox" id="w"> Tylko moja lista</label>
+</div>
+<p class="note" id="upd"></p>
+<div id="out"></div>
+<footer>To materiał informacyjny, nie rekomendacja inwestycyjna. Zgłoszenia mają opóźnienie: Form 4 do 2 dni, polityków do 45 dni, 13F do 45 dni po kwartale. Kwoty polityków podawane są w przedziałach.</footer>
+</main>
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const usd=n=>n?"$"+Math.round(n).toLocaleString("pl-PL"):"";
+const typ=t=>/^purchase/i.test(t)?["Kupno","buy"]:/^sale/i.test(t)?["Sprzedaż","sell"]:[t||"","" ];
+const own={Spouse:"Małżonek",Joint:"Wspólne","Dependent Child":"Dziecko","":"Własne"};
+const lnk=u=>/^https:\/\//.test(u||"")?`<a href="${esc(u)}" target="_blank" rel="noopener">źródło</a>`:"";
+let D=null,tab="politicians";
+
+const views={
+  politicians:{cols:["Zgłoszono","Transakcja","Izba","Polityk","Spółka","Typ","Kwota","Właściciel","",""],
+    row:r=>{const [t,c]=typ(r.type);return [r.disclosed,r.tx,r.chamber,`${esc(r.name)} (${esc(r.region)})`,`<b>${esc(r.ticker)}</b>`,`<span class="${c}">${t}</span>`,esc(r.amount),own[r.owner]??esc(r.owner),lnk(r.link),r.dup?'<span class="note" title="Identyczny wpis pojawił się wcześniej. Sprawdź w źródle.">możliwy duplikat</span>':""]},
+    hl:r=>D.watch.includes(r.ticker)||D.vip.some(v=>r.name.includes(v)), text:r=>`${r.name} ${r.ticker} ${r.asset}`},
+  insiders:{cols:["Złożono","Transakcja","Spółka","Osoba","Rola","Typ","Akcje","Cena","Wartość",""],
+    row:r=>{const [t,c]=typ(r.type);return [r.filed,r.date,`<b>${esc(r.ticker)}</b>`,esc(r.person),esc(r.role),`<span class="${c}">${t}</span>`,Math.round(r.shares).toLocaleString("pl-PL"),r.price?"$"+r.price.toFixed(2):"",usd(r.value),lnk(r.link)]},
+    hl:()=>true, text:r=>`${r.person} ${r.ticker}`, num:[6,7,8]}
+};
+
+function table(v,rows){
+  if(!rows.length) return '<div class="wrap"><div class="empty">Brak wyników. Zmień filtr albo poczekaj na kolejną aktualizację.</div></div>';
+  const body=rows.slice(0,300).map(r=>`<tr class="${v.hl(r)?"hl":""}">${v.row(r).map((c,i)=>`<td class="${v.num&&v.num.includes(i)?"n":""}">${c??""}</td>`).join("")}</tr>`).join("");
+  return `<div class="wrap"><table><thead><tr>${v.cols.map(c=>`<th>${c}</th>`).join("")}</tr></thead><tbody>${body}</tbody></table></div>`;
+}
+
+function funds(q){
+  const list=D.funds.filter(f=>!q||f.fund.toLowerCase().includes(q)||f.top.some(h=>h.name.toLowerCase().includes(q)));
+  if(!list.length) return table(views.insiders,[]);
+  return list.map(f=>{
+    const rows=f.top.map(h=>`<tr><td>${esc(h.name)}</td><td class="n">${Math.round(h.shares).toLocaleString("pl-PL")}</td><td class="n">${usd(h.value)}</td><td class="n ${h.change==="nowa"||h.change>0?"buy":h.change<0?"sell":""}">${h.change==null?"":h.change==="nowa"?"nowa pozycja":(h.change>0?"+":"")+h.change+"%"}</td></tr>`).join("");
+    return `<h2>${esc(f.fund)}</h2><p class="note">Raport za ${esc(f.period)}, złożony ${esc(f.filed)}. Łączna wartość akcji: ${usd(f.total)}. Pokazano 12 największych pozycji.</p><div class="wrap"><table><thead><tr><th>Spółka</th><th class="n">Akcje</th><th class="n">Wartość</th><th class="n">Zmiana od poprzedniego kwartału</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  }).join("");
+}
+
+function render(){
+  if(!D) return;
+  const q=$("#q").value.trim().toLowerCase(), w=$("#w").checked;
+  $("#wl").style.display=tab==="politicians"?"flex":"none";
+  if(tab==="funds"){ $("#out").innerHTML=funds(q); return; }
+  const v=views[tab];
+  const rows=D[tab].filter(r=>(!q||v.text(r).toLowerCase().includes(q))&&(!w||v.hl(r)));
+  $("#out").innerHTML=table(v,rows);
+}
+
+document.querySelectorAll("[role=tab]").forEach(b=>b.onclick=()=>{
+  tab=b.dataset.t;
+  document.querySelectorAll("[role=tab]").forEach(x=>x.setAttribute("aria-selected",x===b));
+  render();
+});
+$("#q").oninput=render; $("#w").onchange=render;
+
+fetch("data.json").then(r=>r.json()).then(d=>{
+  D=d; $("#upd").textContent="Ostatnia aktualizacja: "+new Date(d.updated).toLocaleString("pl-PL"); render();
+}).catch(()=>{$("#out").innerHTML='<div class="wrap"><div class="empty">Nie udało się wczytać danych. Uruchom bota w zakładce Actions i odśwież stronę.</div></div>'});
+</script>
+</body>
+</html>
