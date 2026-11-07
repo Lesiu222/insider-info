@@ -136,14 +136,28 @@ def funds():
 
 
 # ---------- Politycy (FMP) ----------
+def fmp(ep, page, limit, key):
+    return requests.get(f"https://financialmodelingprep.com/stable/{ep}",
+                        params={"page": page, "limit": limit, "apikey": key}, timeout=30)
+
+
 def politicians(key):
     rows, seen = [], {}
     for chamber, ep in (("Senat", "senate-latest"), ("Izba", "house-latest")):
-        for page in range(4):
-            r = requests.get(f"https://financialmodelingprep.com/stable/{ep}",
-                             params={"page": page, "limit": 100, "apikey": key}, timeout=30)
+        # Plan FMP moze dopuszczac tylko male porcje, wiec probujemy od najwiekszej
+        first, limit = None, None
+        for l in (100, 50, 25, 10, 5):
+            r = fmp(ep, 0, l, key)
+            print(ep, "limit", l, "status", r.status_code, "" if r.status_code == 200 else r.text[:150])
+            if r.status_code == 200:
+                first, limit = r, l
+                break
+        if not first:
+            continue
+        for page in range(min(max(1, 400 // limit), 12)):
+            r = first if page == 0 else fmp(ep, page, limit, key)
             if r.status_code != 200:
-                print(ep, "status", r.status_code)
+                print(ep, "strona", page, "status", r.status_code)
                 break
             data = r.json()
             if not data:
@@ -166,7 +180,7 @@ def politicians(key):
 
 def main():
     os.makedirs("site", exist_ok=True)
-    data = {"updated": dt.datetime.utcnow().isoformat() + "Z", "watch": TICKERS, "vip": VIP,
+    data = {"updated": dt.datetime.now(dt.timezone.utc).isoformat(), "watch": TICKERS, "vip": VIP,
             "politicians": [], "insiders": [], "funds": []}
     key = os.environ.get("FMP_API_KEY")
     if key:
