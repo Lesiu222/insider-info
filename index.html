@@ -5,72 +5,86 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Insider Info</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#141a26;--panel:#1b2333;--line:#2b3550;--text:#ebe6d8;--dim:#98a0b3;--buy:#7cc79c;--sell:#e8826f;--gold:#e2b44f}
+:root{--bg:#0a0a0a;--text:#f2f2f0;--dim:#82827e;--line:#232321;--y:#f5c518;--buy:#7fc794;--sell:#e0705f}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 "IBM Plex Sans",system-ui,sans-serif}
-main{max-width:1100px;margin:0 auto;padding:40px 20px 60px}
-h1{font-size:clamp(28px,5vw,44px);line-height:1.1;margin:0 0 10px;font-weight:600;letter-spacing:-.02em}
-.sub{color:var(--dim);max-width:60ch;margin:0 0 28px}
-.bar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:16px}
-.tabs{display:flex;gap:4px;background:var(--panel);padding:4px;border-radius:10px}
-.tabs button{background:none;border:0;color:var(--dim);font:inherit;padding:8px 16px;border-radius:7px;cursor:pointer}
-.tabs button[aria-selected=true]{background:var(--gold);color:#1b1608;font-weight:600}
-input[type=search]{background:var(--panel);border:1px solid var(--line);color:var(--text);font:inherit;padding:9px 12px;border-radius:8px;min-width:220px}
-:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
-.wrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--panel);margin-bottom:20px}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+header{position:sticky;top:0;z-index:10;background:rgba(10,10,10,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.hd{max-width:1100px;margin:0 auto;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;color:var(--text);text-decoration:none;font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:14px}
+.mark{width:14px;height:14px;background:var(--y);border-radius:3px;margin-right:12px}
+nav{display:flex;gap:22px}
+nav a{color:var(--dim);text-decoration:none;font-size:14px;padding:4px 0;border-bottom:2px solid transparent}
+nav a:hover{color:var(--text)}
+nav a.on{color:var(--text);border-color:var(--y)}
+main{max-width:1100px;margin:0 auto;padding:56px 24px 40px}
+h1{font-size:clamp(36px,7vw,72px);line-height:1.02;letter-spacing:-.035em;font-weight:700;margin:0 0 16px}
+.sub{color:var(--dim);max-width:52ch;margin:0 0 40px;font-size:17px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:16px}
+.big{display:flex;flex-direction:column;justify-content:space-between;gap:48px;min-height:260px;padding:26px;border:1px solid var(--line);border-radius:14px;color:var(--text);text-decoration:none;transition:border-color .2s,background .2s}
+.big:hover,.big:focus-visible{border-color:var(--y);background:#111110;outline:0}
+.big .num{color:var(--dim);font-size:13px;font-variant-numeric:tabular-nums}
+.big b{display:block;font-size:30px;letter-spacing:-.02em;font-weight:600;margin-bottom:6px}
+.big em{font-style:normal;color:var(--dim)}
+.cnt{display:flex;justify-content:space-between;align-items:center;color:var(--dim);font-size:13px}
+.cnt i{font-style:normal;font-size:22px;color:var(--text);transition:transform .2s,color .2s}
+.big:hover .cnt i{transform:translateX(6px);color:var(--y)}
+.pt{font-size:clamp(30px,5vw,48px);margin-bottom:8px}
+.tools{display:flex;flex-wrap:wrap;gap:16px;align-items:center;margin:0 0 20px}
+input[type=search]{background:transparent;border:1px solid var(--line);color:var(--text);font:inherit;padding:10px 14px;border-radius:10px;min-width:260px}
+input[type=search]:focus{outline:0;border-color:var(--y)}
+.note{color:var(--dim);font-size:13px;margin:0}
+.wrap{overflow-x:auto;border-top:1px solid var(--line);margin-bottom:28px}
 table{border-collapse:collapse;width:100%;min-width:720px}
-th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
-th{color:var(--dim);font-weight:500;font-size:13px}
-tr:last-child td{border-bottom:0}
-td.n{text-align:right;font-variant-numeric:tabular-nums}
+th,td{padding:12px 14px 12px 0;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+th{color:var(--dim);font-weight:500;font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+tbody tr:hover{background:#111110}
+td.n,th.n{text-align:right}
 .buy{color:var(--buy);font-weight:600}.sell{color:var(--sell);font-weight:600}
-a{color:var(--gold)}
-.note{color:var(--dim);font-size:13px}
-h2{font-size:18px;margin:24px 0 4px}
-.empty{padding:30px;color:var(--dim)}
-footer{color:var(--dim);font-size:13px;margin-top:32px;border-top:1px solid var(--line);padding-top:16px}
+a{color:var(--y)}
+h2{font-size:20px;margin:36px 0 4px;letter-spacing:-.01em}
+.empty{padding:36px 0;color:var(--dim)}
+footer{max-width:1100px;margin:0 auto;padding:20px 24px 48px;color:var(--dim);font-size:13px;border-top:1px solid var(--line)}
+:focus-visible{outline:2px solid var(--y);outline-offset:3px}
 </style>
 </head>
 <body>
-<main>
-<h1>Insider Info</h1>
-<p class="sub">Jawne transakcje insiderów, funduszy i polityków z USA w jednym miejscu. Dane pochodzą z SEC i oficjalnych zgłoszeń Kongresu.</p>
-<div class="bar">
-  <div class="tabs" role="tablist">
-    <button role="tab" data-t="politicians" aria-selected="true">Politycy</button>
-    <button role="tab" data-t="insiders" aria-selected="false">Insiderzy spółek</button>
-    <button role="tab" data-t="funds" aria-selected="false">Fundusze 13F</button>
-  </div>
-  <input type="search" id="q" placeholder="Szukaj spółki lub osoby" aria-label="Szukaj">
-</div>
-<p class="note" id="upd"></p>
-<div id="out"></div>
+<header><div class="hd">
+  <a class="logo" href="#" aria-label="Insider Info, strona główna"><span class="mark"></span>Insider Info</a>
+  <nav id="nav"></nav>
+</div></header>
+<main id="app"></main>
 <footer>To materiał informacyjny, nie rekomendacja inwestycyjna. Zgłoszenia mają opóźnienie: Form 4 do 2 dni, polityków do 45 dni, 13F do 45 dni po kwartale. Kwoty polityków podawane są w przedziałach.</footer>
-</main>
 <script>
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const usd=n=>n?"$"+Math.round(n).toLocaleString("pl-PL"):"";
-const typ=t=>/^purchase/i.test(t)?["Kupno","buy"]:/^sale/i.test(t)?["Sprzedaż","sell"]:[t||"","" ];
+const typ=t=>/^purchase/i.test(t)?["Kupno","buy"]:/^sale/i.test(t)?["Sprzedaż","sell"]:[t||"",""];
 const own={Spouse:"Małżonek",Joint:"Wspólne","Dependent Child":"Dziecko","":"Własne"};
 const lnk=u=>/^https:\/\//.test(u||"")?`<a href="${esc(u)}" target="_blank" rel="noopener">źródło</a>`:"";
-let D=null,tab="politicians";
+let D=null,tab="";
+
+const T={
+  politicians:{name:"Politycy",desc:"Transakcje senatorów i posłów z Kongresu USA",unit:"transakcji"},
+  insiders:{name:"Insiderzy",desc:"Zakupy i sprzedaże zarządów i dyrektorów spółek",unit:"transakcji"},
+  funds:{name:"Fundusze",desc:"Portfele największych funduszy z raportów 13F",unit:"funduszy"}
+};
 
 const views={
   politicians:{cols:["Zgłoszono","Transakcja","Izba","Polityk","Spółka","Typ","Kwota","Właściciel","",""],
     row:r=>{const [t,c]=typ(r.type);return [r.disclosed,r.tx,r.chamber,`${esc(r.name)} (${esc(r.region)})`,`<b>${esc(r.ticker)}</b>`,`<span class="${c}">${t}</span>`,esc(r.amount),own[r.owner]??esc(r.owner),lnk(r.link),r.dup?'<span class="note" title="Identyczny wpis pojawił się wcześniej. Sprawdź w źródle.">możliwy duplikat</span>':""]},
-    hl:r=>D.watch.includes(r.ticker)||D.vip.some(v=>r.name.includes(v)), text:r=>`${r.name} ${r.ticker} ${r.asset}`},
+    text:r=>`${r.name} ${r.ticker} ${r.asset}`},
   insiders:{cols:["Złożono","Transakcja","Spółka","Osoba","Rola","Typ","Akcje","Cena","Wartość",""],
     row:r=>{const [t,c]=typ(r.type);return [r.filed,r.date,`<b>${esc(r.ticker)}</b>`,esc(r.person),esc(r.role),`<span class="${c}">${t}</span>`,Math.round(r.shares).toLocaleString("pl-PL"),r.price?"$"+r.price.toFixed(2):"",usd(r.value),lnk(r.link)]},
-    hl:()=>true, text:r=>`${r.person} ${r.ticker}`, num:[6,7,8]}
+    text:r=>`${r.person} ${r.ticker}`, num:[6,7,8]}
 };
 
 function table(v,rows){
-  if(!rows.length) return '<div class="wrap"><div class="empty">Brak wyników. Zmień filtr albo poczekaj na kolejną aktualizację.</div></div>';
-  const body=rows.slice(0,300).map(r=>`<tr class="${v.hl(r)?"hl":""}">${v.row(r).map((c,i)=>`<td class="${v.num&&v.num.includes(i)?"n":""}">${c??""}</td>`).join("")}</tr>`).join("");
-  return `<div class="wrap"><table><thead><tr>${v.cols.map(c=>`<th>${c}</th>`).join("")}</tr></thead><tbody>${body}</tbody></table></div>`;
+  if(!rows.length) return '<div class="empty">Brak wyników. Zmień wyszukiwanie albo poczekaj na kolejną aktualizację.</div>';
+  const body=rows.slice(0,300).map(r=>`<tr>${v.row(r).map((c,i)=>`<td class="${v.num&&v.num.includes(i)?"n":""}">${c??""}</td>`).join("")}</tr>`).join("");
+  return `<div class="wrap"><table><thead><tr>${v.cols.map((c,i)=>`<th class="${v.num&&v.num.includes(i)?"n":""}">${c}</th>`).join("")}</tr></thead><tbody>${body}</tbody></table></div>`;
 }
 
 function funds(q){
@@ -82,25 +96,27 @@ function funds(q){
   }).join("");
 }
 
-function render(){
-  if(!D) return;
-  const q=$("#q").value.trim().toLowerCase();
-    if(tab==="funds"){ $("#out").innerHTML=funds(q); return; }
-  const v=views[tab];
-  const rows=D[tab].filter(r=>(!q||v.text(r).toLowerCase().includes(q)));
-  $("#out").innerHTML=table(v,rows);
+function draw(){
+  if(!D||!tab) return;
+  const q=($("#q")?.value||"").trim().toLowerCase();
+  $("#out").innerHTML=tab==="funds"?funds(q):table(views[tab],D[tab].filter(r=>!q||views[tab].text(r).toLowerCase().includes(q)));
 }
 
-document.querySelectorAll("[role=tab]").forEach(b=>b.onclick=()=>{
-  tab=b.dataset.t;
-  document.querySelectorAll("[role=tab]").forEach(x=>x.setAttribute("aria-selected",x===b));
-  render();
-});
-$("#q").oninput=render;
+function route(){
+  const h=location.hash.slice(1);
+  tab=T[h]?h:"";
+  $("#nav").innerHTML=Object.keys(T).map(k=>`<a href="#${k}" class="${k===tab?"on":""}">${T[k].name}</a>`).join("");
+  if(!tab){
+    $("#app").innerHTML=`<h1>Czyj ruch<br>chcesz zobaczyć?</h1><p class="sub">Jawne transakcje polityków, insiderów i funduszy z USA w jednym miejscu.</p><div class="grid">${Object.keys(T).map((k,i)=>`<a class="big" href="#${k}"><span class="num">0${i+1}</span><span><b>${T[k].name}</b><em>${T[k].desc}</em></span><span class="cnt">${D?D[k].length+" "+T[k].unit:""}<i>→</i></span></a>`).join("")}</div>`;
+    return;
+  }
+  $("#app").innerHTML=`<h1 class="pt">${T[tab].name}</h1><p class="sub">${T[tab].desc}.</p><div class="tools"><input type="search" id="q" placeholder="Szukaj spółki lub osoby" aria-label="Szukaj"><p class="note">${D?"Ostatnia aktualizacja: "+new Date(D.updated).toLocaleString("pl-PL"):""}</p></div><div id="out"></div>`;
+  $("#q").oninput=draw; draw(); window.scrollTo(0,0);
+}
 
-fetch("data.json").then(r=>r.json()).then(d=>{
-  D=d; $("#upd").textContent="Ostatnia aktualizacja: "+new Date(d.updated).toLocaleString("pl-PL"); render();
-}).catch(()=>{$("#out").innerHTML='<div class="wrap"><div class="empty">Nie udało się wczytać danych. Uruchom bota w zakładce Actions i odśwież stronę.</div></div>'});
+addEventListener("hashchange",route);
+route();
+fetch("data.json").then(r=>r.json()).then(d=>{D=d;route()}).catch(()=>{$("#app").insertAdjacentHTML("beforeend",'<div class="empty">Nie udało się wczytać danych. Uruchom bota w zakładce Actions i odśwież stronę.</div>')});
 </script>
 </body>
 </html>
