@@ -2,7 +2,7 @@ import json, os, sys, time, datetime as dt
 import xml.etree.ElementTree as ET
 import requests
 
-UA = {"User-Agent": "test"}  # w main() ustawiany z sekretu SEC_CONTACT
+UA = {"User-Agent": "test"}  
 
 # Spolki, ktorych insiderow (Form 4) sledzimy
 TICKERS = ["AAPL", "MSFT", "NVDA", "GOOGL", "AMZN", "META", "TSLA", "PLTR",
