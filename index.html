@@ -4,50 +4,82 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Insider Info</title>
+<meta name="description" content="Jawne transakcje polityków, insiderów spółek i funduszy z USA w jednym miejscu.">
+<meta name="theme-color" content="#0a0a0a">
+<meta property="og:title" content="Insider Info">
+<meta property="og:description" content="Czyj ruch chcesz zobaczyć? Politycy, insiderzy i fundusze z USA.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23f5c518'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0a0a0a;--text:#f2f2f0;--dim:#82827e;--line:#232321;--y:#f5c518;--buy:#7fc794;--sell:#e0705f}
 *{box-sizing:border-box}
-html{scroll-behavior:smooth}
 body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
 header{position:sticky;top:0;z-index:10;background:rgba(10,10,10,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
 .hd{max-width:1100px;margin:0 auto;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
 .logo{display:flex;align-items:center;color:var(--text);text-decoration:none;font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:14px}
 .mark{width:14px;height:14px;background:var(--y);border-radius:3px;margin-right:12px}
-nav{display:flex;gap:22px}
+nav{display:flex;gap:20px;flex-wrap:wrap}
 nav a{color:var(--dim);text-decoration:none;font-size:14px;padding:4px 0;border-bottom:2px solid transparent}
-nav a:hover{color:var(--text)}
-nav a.on{color:var(--text);border-color:var(--y)}
-main{max-width:1100px;margin:0 auto;padding:56px 24px 40px}
+nav a:hover{color:var(--text)}nav a.on{color:var(--text);border-color:var(--y)}
+main{max-width:1100px;margin:0 auto;padding:48px 24px 40px}
 h1{font-size:clamp(36px,7vw,72px);line-height:1.02;letter-spacing:-.035em;font-weight:700;margin:0 0 16px}
-.sub{color:var(--dim);max-width:52ch;margin:0 0 40px;font-size:17px}
+h1.pt{font-size:clamp(30px,5vw,48px);margin-bottom:8px}
+h2{font-size:18px;margin:32px 0 10px;letter-spacing:-.01em}
+.sub{color:var(--dim);max-width:56ch;margin:0 0 32px;font-size:17px}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:16px}
-.big{display:flex;flex-direction:column;justify-content:space-between;gap:48px;min-height:260px;padding:26px;border:1px solid var(--line);border-radius:14px;color:var(--text);text-decoration:none;transition:border-color .2s,background .2s}
+.big{display:flex;flex-direction:column;justify-content:space-between;gap:48px;min-height:240px;padding:26px;border:1px solid var(--line);border-radius:14px;color:var(--text);text-decoration:none;transition:border-color .2s,background .2s}
 .big:hover,.big:focus-visible{border-color:var(--y);background:#111110;outline:0}
-.big .num{color:var(--dim);font-size:13px;font-variant-numeric:tabular-nums}
+.big .num{color:var(--dim);font-size:13px}
 .big b{display:block;font-size:30px;letter-spacing:-.02em;font-weight:600;margin-bottom:6px}
 .big em{font-style:normal;color:var(--dim)}
 .cnt{display:flex;justify-content:space-between;align-items:center;color:var(--dim);font-size:13px}
 .cnt i{font-style:normal;font-size:22px;color:var(--text);transition:transform .2s,color .2s}
 .big:hover .cnt i{transform:translateX(6px);color:var(--y)}
-.pt{font-size:clamp(30px,5vw,48px);margin-bottom:8px}
-.tools{display:flex;flex-wrap:wrap;gap:16px;align-items:center;margin:0 0 20px}
-input[type=search]{background:transparent;border:1px solid var(--line);color:var(--text);font:inherit;padding:10px 14px;border-radius:10px;min-width:260px}
-input[type=search]:focus{outline:0;border-color:var(--y)}
-.note{color:var(--dim);font-size:13px;margin:0}
-.wrap{overflow-x:auto;border-top:1px solid var(--line);margin-bottom:28px}
-table{border-collapse:collapse;width:100%;min-width:720px}
-th,td{padding:12px 14px 12px 0;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+.panel{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:32px;margin-top:24px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:0}
+.chip{display:inline-block;border:1px solid var(--line);border-radius:99px;padding:2px 10px;font-size:12px;color:var(--y)}
+a.chip.big{min-height:0;gap:0;padding:6px 14px;font-size:14px;color:var(--text);text-decoration:none;display:inline-block;flex-direction:row}
+a.chip.big b{display:inline;font-size:inherit;color:var(--y);margin:0 0 0 6px}
+a.chip.big:hover{border-color:var(--y)}
+.feed{list-style:none;margin:0;padding:0}
+.feed li{padding:9px 0;border-bottom:1px solid var(--line)}
+.dim{color:var(--dim)}
+.tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:0 0 14px}
+input[type=search],select{background:transparent;border:1px solid var(--line);color:var(--text);font:inherit;padding:9px 12px;border-radius:10px}
+input[type=search]{min-width:240px}select option{background:#111}
+input:focus,select:focus{outline:0;border-color:var(--y)}
+.note{color:var(--dim);font-size:13px;margin:0 0 8px}
+.warn{border:1px solid var(--y);color:var(--y);border-radius:10px;padding:10px 14px;font-size:14px;margin:0 0 20px}
+.wrap{overflow-x:auto;border-top:1px solid var(--line);margin-bottom:20px}
+table{border-collapse:collapse;width:100%;min-width:760px}
+th,td{padding:11px 14px 11px 0;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
 th{color:var(--dim);font-weight:500;font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+.sb{all:unset;cursor:pointer}.sb:hover,.sb:focus-visible{color:var(--text)}
 tbody tr:hover{background:#111110}
 td.n,th.n{text-align:right}
 .buy{color:var(--buy);font-weight:600}.sell{color:var(--sell);font-weight:600}
-a{color:var(--y)}
-h2{font-size:20px;margin:36px 0 4px;letter-spacing:-.01em}
+a{color:var(--y)}a.tk{font-weight:600;text-decoration:none;border-bottom:1px dotted var(--y)}
+.bar{display:inline-block;width:60px;height:6px;background:var(--line);border-radius:3px;vertical-align:middle;margin-right:8px}
+.bar i{display:block;height:100%;background:var(--y);border-radius:3px}
+.more{background:transparent;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px 20px;font:inherit;cursor:pointer;margin-bottom:24px}
+.more:hover{border-color:var(--y)}
 .empty{padding:36px 0;color:var(--dim)}
+.about{max-width:68ch}.about p,.about li{color:#cfcfca}
 footer{max-width:1100px;margin:0 auto;padding:20px 24px 48px;color:var(--dim);font-size:13px;border-top:1px solid var(--line)}
 :focus-visible{outline:2px solid var(--y);outline-offset:3px}
+@media(max-width:700px){
+ main{padding-top:32px}
+ table,thead,tbody,tr,td{display:block;min-width:0}
+ thead{display:none}
+ tr{border-bottom:1px solid var(--line);padding:12px 0}
+ td{display:flex;justify-content:space-between;gap:12px;border:0;padding:3px 0;white-space:normal;text-align:right}
+ td::before{content:attr(data-label);color:var(--dim);text-align:left;font-size:12px;flex:none}
+ td:empty{display:none}
+ .wrap{border-top:0}
+ input[type=search]{min-width:0;width:100%}
+}
 </style>
 </head>
 <body>
@@ -56,67 +88,131 @@ footer{max-width:1100px;margin:0 auto;padding:20px 24px 48px;color:var(--dim);fo
   <nav id="nav"></nav>
 </div></header>
 <main id="app"></main>
-<footer>To materiał informacyjny, nie rekomendacja inwestycyjna. Zgłoszenia mają opóźnienie: Form 4 do 2 dni, polityków do 45 dni, 13F do 45 dni po kwartale. Kwoty polityków podawane są w przedziałach.</footer>
+<footer>To materiał informacyjny, nie rekomendacja inwestycyjna. Zgłoszenia mają opóźnienie: Form 4 do 2 dni, polityków do 45 dni, 13F do 45 dni po kwartale. Kwoty polityków podawane są w przedziałach. Dane o transakcjach prezydenta Trumpa pochodzą z formularzy OGE 278-T, w wersji uporządkowanej przez <a href="https://open-cabinet.vercel.app" target="_blank" rel="noopener">Open Cabinet</a>. <a href="#about">O projekcie</a></footer>
 <script>
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const usd=n=>n?"$"+Math.round(n).toLocaleString("pl-PL"):"";
-const typ=t=>/^purchase/i.test(t)?["Kupno","buy"]:/^sale/i.test(t)?["Sprzedaż","sell"]:[t||"",""];
+const TODAY=new Date().toISOString().slice(0,10);
+const days=(a,b)=>Math.round((new Date(b)-new Date(a))/864e5);
+const fd=d=>d?`${d.slice(8,10)}.${d.slice(5,7)}.${d.slice(0,4)}`:"";
+const dn=n=>n===1?"1 dzień":n+" dni";
+const ago=d=>{const n=days(d,TODAY);return n<=0?"dzisiaj":n===1?"wczoraj":n+" dni temu"};
+const isBuy=t=>/^purchase/i.test(t||""),isSell=t=>/^sale/i.test(t||"");
+const tp=t=>isBuy(t)?'<span class="buy">▲ Kupno</span>':isSell(t)?'<span class="sell">▼ Sprzedaż</span>':esc(t);
+const tk=t=>/^[A-Za-z0-9-]+$/.test(t||"")?`<a class="tk" href="#t-${esc(t)}">${esc(t)}</a>`:esc(t);
+const amt=s=>+String(s||"").replace(/[^0-9-]/g,"").split("-")[0]||0;
 const own={Spouse:"Małżonek",Joint:"Wspólne","Dependent Child":"Dziecko","":"Własne"};
 const lnk=u=>/^https:\/\//.test(u||"")?`<a href="${esc(u)}" target="_blank" rel="noopener">źródło</a>`:"";
-let D=null,tab="";
+const T=["politicians","insiders","funds"];
+let D=null,tab="",CL=new Set(),P={};
 
-const T={
-  politicians:{name:"Politycy",desc:"Transakcje senatorów i posłów z Kongresu USA",unit:"transakcji"},
-  insiders:{name:"Insiderzy",desc:"Zakupy i sprzedaże zarządów i dyrektorów spółek",unit:"transakcji"},
-  funds:{name:"Fundusze",desc:"Portfele największych funduszy z raportów 13F",unit:"funduszy"}
+const V={
+ politicians:{name:"Politycy",desc:"Transakcje senatorów, posłów i prezydenta USA",unit:"transakcji",date:r=>r.tx,
+  cols:[["Zgłoszono",r=>fd(r.disclosed),r=>r.disclosed],["Transakcja",r=>fd(r.tx),r=>r.tx],["Opóźnienie",r=>dn(days(r.tx,r.disclosed)),r=>days(r.tx,r.disclosed),1],["Izba",r=>esc(r.chamber),r=>r.chamber],["Polityk",r=>esc(r.name)+(r.region?` (${esc(r.region)})`:""),r=>r.name],["Spółka",r=>tk(r.ticker),r=>r.ticker],["Typ",r=>tp(r.type),r=>r.type],["Kwota",r=>esc(r.amount),r=>amt(r.amount),1],["Właściciel",r=>own[r.owner]??esc(r.owner),r=>r.owner],["",r=>lnk(r.link)+(r.dup?' <span class="note" title="Identyczny wpis pojawił się wcześniej. Sprawdź w źródle.">możliwy duplikat</span>':"")]],
+  text:r=>`${r.name} ${r.ticker} ${r.asset}`},
+ insiders:{name:"Insiderzy",desc:"Zakupy i sprzedaże zarządów i dyrektorów spółek",unit:"transakcji",date:r=>r.date,
+  cols:[["Złożono",r=>fd(r.filed),r=>r.filed],["Transakcja",r=>fd(r.date),r=>r.date],["Opóźnienie",r=>dn(days(r.date,r.filed)),r=>days(r.date,r.filed),1],["Spółka",r=>tk(r.ticker)+(CL.has(r.ticker)&&isBuy(r.type)?' <span class="chip" title="Co najmniej 3 różnych insiderów kupowało w ciągu 30 dni">klaster</span>':""),r=>r.ticker],["Osoba",r=>esc(r.person),r=>r.person],["Rola",r=>esc(r.role),r=>r.role],["Typ",r=>tp(r.type),r=>r.type],["Akcje",r=>Math.round(r.shares).toLocaleString("pl-PL"),r=>r.shares,1],["Cena",r=>r.price?"$"+r.price.toFixed(2):"",r=>r.price,1],["Wartość",r=>usd(r.value),r=>r.value,1],["",r=>lnk(r.link)]],
+  text:r=>`${r.person} ${r.ticker}`},
+ funds:{name:"Fundusze",desc:"Portfele największych funduszy z raportów 13F",unit:"funduszy"}
 };
 
-const views={
-  politicians:{cols:["Zgłoszono","Transakcja","Izba","Polityk","Spółka","Typ","Kwota","Właściciel","",""],
-    row:r=>{const [t,c]=typ(r.type);return [r.disclosed,r.tx,r.chamber,`${esc(r.name)} (${esc(r.region)})`,`<b>${esc(r.ticker)}</b>`,`<span class="${c}">${t}</span>`,esc(r.amount),own[r.owner]??esc(r.owner),lnk(r.link),r.dup?'<span class="note" title="Identyczny wpis pojawił się wcześniej. Sprawdź w źródle.">możliwy duplikat</span>':""]},
-    text:r=>`${r.name} ${r.ticker} ${r.asset}`},
-  insiders:{cols:["Złożono","Transakcja","Spółka","Osoba","Rola","Typ","Akcje","Cena","Wartość",""],
-    row:r=>{const [t,c]=typ(r.type);return [r.filed,r.date,`<b>${esc(r.ticker)}</b>`,esc(r.person),esc(r.role),`<span class="${c}">${t}</span>`,Math.round(r.shares).toLocaleString("pl-PL"),r.price?"$"+r.price.toFixed(2):"",usd(r.value),lnk(r.link)]},
-    text:r=>`${r.person} ${r.ticker}`, num:[6,7,8]}
-};
-
-function table(v,rows){
-  if(!rows.length) return '<div class="empty">Brak wyników. Zmień wyszukiwanie albo poczekaj na kolejną aktualizację.</div>';
-  const body=rows.slice(0,300).map(r=>`<tr>${v.row(r).map((c,i)=>`<td class="${v.num&&v.num.includes(i)?"n":""}">${c??""}</td>`).join("")}</tr>`).join("");
-  return `<div class="wrap"><table><thead><tr>${v.cols.map((c,i)=>`<th class="${v.num&&v.num.includes(i)?"n":""}">${c}</th>`).join("")}</tr></thead><tbody>${body}</tbody></table></div>`;
+function tbl(v,rows,sortable){
+  if(!rows.length) return '<div class="wrap"><div class="empty">Brak wyników. Zmień filtry albo poczekaj na kolejną aktualizację.</div></div>';
+  const h=v.cols.map((c,i)=>`<th class="${c[3]?"n":""}">${c[2]&&sortable?`<button class="sb" data-s="${i}">${c[0]}${P.s===i?(P.d<0?" ↓":" ↑"):""}</button>`:c[0]}</th>`).join("");
+  const b=rows.map(r=>`<tr>${v.cols.map(c=>`<td data-label="${c[0]}" class="${c[3]?"n":""}">${c[1](r)}</td>`).join("")}</tr>`).join("");
+  return `<div class="wrap"><table><thead><tr>${h}</tr></thead><tbody>${b}</tbody></table></div>`;
 }
 
 function funds(q){
   const list=D.funds.filter(f=>!q||f.fund.toLowerCase().includes(q)||f.top.some(h=>h.name.toLowerCase().includes(q)));
-  if(!list.length) return table(views.insiders,[]);
+  if(!list.length) return '<div class="wrap"><div class="empty">Brak wyników.</div></div>';
   return list.map(f=>{
-    const rows=f.top.map(h=>`<tr><td>${esc(h.name)}</td><td class="n">${Math.round(h.shares).toLocaleString("pl-PL")}</td><td class="n">${usd(h.value)}</td><td class="n ${h.change==="nowa"||h.change>0?"buy":h.change<0?"sell":""}">${h.change==null?"":h.change==="nowa"?"nowa pozycja":(h.change>0?"+":"")+h.change+"%"}</td></tr>`).join("");
-    return `<h2>${esc(f.fund)}</h2><p class="note">Raport za ${esc(f.period)}, złożony ${esc(f.filed)}. Łączna wartość akcji: ${usd(f.total)}. Pokazano 12 największych pozycji.</p><div class="wrap"><table><thead><tr><th>Spółka</th><th class="n">Akcje</th><th class="n">Wartość</th><th class="n">Zmiana od poprzedniego kwartału</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+    const rows=f.top.map(h=>{const p=f.total?h.value/f.total*100:0;return `<tr><td data-label="Spółka">${esc(h.name)}</td><td data-label="Akcje" class="n">${Math.round(h.shares).toLocaleString("pl-PL")}</td><td data-label="Wartość" class="n">${usd(h.value)}</td><td data-label="Udział" class="n"><span class="bar"><i style="width:${Math.min(100,p*3)}%"></i></span>${p.toFixed(1)}%</td><td data-label="Zmiana" class="n ${h.change==="nowa"||h.change>0?"buy":h.change<0?"sell":""}">${h.change==null?"":h.change==="nowa"?"nowa pozycja":(h.change>0?"+":"")+h.change+"%"}</td></tr>`}).join("");
+    return `<h2>${esc(f.fund)}</h2><p class="note">Raport za ${fd(f.period)}, złożony ${fd(f.filed)}. Łączna wartość akcji: ${usd(f.total)}. Pokazano 12 największych pozycji.</p><div class="wrap"><table><thead><tr><th>Spółka</th><th class="n">Akcje</th><th class="n">Wartość</th><th class="n">Udział</th><th class="n">Zmiana od poprzedniego kwartału</th></tr></thead><tbody>${rows}</tbody></table></div>`;
   }).join("");
 }
 
-function draw(){
-  if(!D||!tab) return;
-  const q=($("#q")?.value||"").trim().toLowerCase();
-  $("#out").innerHTML=tab==="funds"?funds(q):table(views[tab],D[tab].filter(r=>!q||views[tab].text(r).toLowerCase().includes(q)));
+function stale(k){
+  const f=D.fresh&&D.fresh[k];if(!f) return "";
+  const n=days(f.slice(0,10),TODAY);
+  return n>=3?`<p class="warn">Uwaga: to źródło nie dało świeżych danych od ${dn(n)}. Widzisz ostatnie zapisane wpisy.</p>`:"";
 }
+
+function draw(){
+  if(!D||!T.includes(tab)) return;
+  const q=(P.q||"").toLowerCase();
+  if(tab==="funds"){$("#out").innerHTML=funds(q);return}
+  const v=V[tab];
+  let rows=D[tab].filter(r=>(!q||v.text(r).toLowerCase().includes(q))&&(!P.t||(P.t==="b"?isBuy(r.type):isSell(r.type)))&&(!P.c||r.chamber===P.c)&&(!P.r||days(v.date(r),TODAY)<=+P.r));
+  if(P.s>=0){const f=v.cols[P.s][2];rows=[...rows].sort((a,b)=>(f(a)>f(b)?1:f(a)<f(b)?-1:0)*-P.d)}
+  const n=rows.length;
+  $("#out").innerHTML=`<p class="note">Wyniki: ${n.toLocaleString("pl-PL")}</p>`+tbl(v,rows.slice(0,P.n),1)+(n>P.n?'<button class="more" id="mo">Pokaż więcej</button>':"");
+}
+
+function controls(k){
+  if(k==="funds") return '<div class="tools"><input type="search" id="q" placeholder="Szukaj funduszu lub spółki" aria-label="Szukaj"></div>';
+  return `<div class="tools"><input type="search" id="q" placeholder="Szukaj spółki lub osoby" aria-label="Szukaj"><select id="ty" aria-label="Typ"><option value="">Kupno i sprzedaż</option><option value="b">Tylko kupno</option><option value="s">Tylko sprzedaż</option></select><select id="rg" aria-label="Okres"><option value="">Cały okres</option><option value="7">Ostatnie 7 dni</option><option value="30">Ostatnie 30 dni</option><option value="90">Ostatnie 90 dni</option></select>${k==="politicians"?'<select id="ch" aria-label="Izba"><option value="">Wszyscy</option><option>Senat</option><option>Izba</option><option>Prezydent</option></select>':""}</div>`;
+}
+
+function home(){
+  let x="";
+  if(D){
+    const ev=[...D.politicians.map(r=>({d:r.tx,t:r.ticker,ty:r.type,w:r.name,k:"Polityk"})),...D.insiders.map(r=>({d:r.date,t:r.ticker,ty:r.type,w:r.person,k:"Insider"}))].filter(e=>e.d&&e.d<=TODAY);
+    const c={};ev.filter(e=>isBuy(e.ty)&&days(e.d,TODAY)<=30).forEach(e=>c[e.t]=(c[e.t]||0)+1);
+    const top=Object.entries(c).sort((a,b)=>b[1]-a[1]).slice(0,8);
+    const feed=[...ev].sort((a,b)=>b.d.localeCompare(a.d)).slice(0,6);
+    const cl=[...CL];
+    x=`<div class="panel"><div><h2>Najczęściej kupowane (30 dni)</h2><p class="chips">${top.map(([t,n])=>`<a class="chip big" href="#t-${esc(t)}">${esc(t)}<b>${n}</b></a>`).join("")||'<span class="dim">Brak danych</span>'}</p>${cl.length?`<p class="note" style="margin-top:14px">Klaster zakupów insiderów: ${cl.map(tk).join(", ")}</p>`:""}</div><div><h2>Najnowsze ruchy</h2><ul class="feed">${feed.map(e=>`<li>${tk(e.t)} ${tp(e.ty)} <span class="dim">${esc(e.w)}, ${e.k}, ${ago(e.d)}</span></li>`).join("")}</ul></div></div>`;
+  }
+  return `<h1>Czyj ruch<br>chcesz zobaczyć?</h1><p class="sub">Jawne transakcje polityków, insiderów i funduszy z USA w jednym miejscu.</p><div class="grid">${T.map((k,i)=>`<a class="big" href="#${k}"><span class="num">0${i+1}</span><span><b>${V[k].name}</b><em>${V[k].desc}</em></span><span class="cnt">${D?D[k].length.toLocaleString("pl-PL")+" "+V[k].unit:""}<i>→</i></span></a>`).join("")}</div>${x}`;
+}
+
+function company(t){
+  if(!D) return "";
+  const p=D.politicians.filter(r=>r.ticker===t),i=D.insiders.filter(r=>r.ticker===t),all=[...p,...i];
+  const b=all.filter(r=>isBuy(r.type)).length,s=all.filter(r=>isSell(r.type)).length;
+  const name=(p[0]&&p[0].asset)||"";
+  const sec=(h,v,rows)=>rows.length?`<h2>${h}</h2>`+tbl(v,rows.slice(0,50),0)+(rows.length>50?`<p class="note">Pokazano 50 z ${rows.length}. Pełną listę znajdziesz w zakładce.</p>`:""):"";
+  return `<h1 class="pt">${esc(t)}</h1><p class="sub">${esc(name)}${name?". ":""}Politycy: ${p.length}, insiderzy: ${i.length}. <span class="buy">▲ ${b}</span> kupna, <span class="sell">▼ ${s}</span> sprzedaże.${CL.has(t)?' <span class="chip">klaster zakupów</span>':""}</p>`+(all.length?sec("Politycy",V.politicians,p)+sec("Insiderzy spółki",V.insiders,i):'<div class="empty">Brak transakcji dla tego tickera w naszych danych.</div>');
+}
+
+const about=`<h1 class="pt">O projekcie</h1><div class="about"><p class="sub">Insider Info zbiera jawne zgłoszenia transakcji i pokazuje je w jednym miejscu. Nic tu nie jest poradą inwestycyjną.</p>
+<h2>Skąd są dane</h2><ul><li><b>Insiderzy:</b> formularze Form 4 z amerykańskiej komisji SEC. Pokazujemy tylko zakupy i sprzedaże na rynku, bez nagród akcji i potrąceń podatkowych.</li><li><b>Fundusze:</b> kwartalne raporty 13F z SEC. Obejmują tylko akcje długie notowane w USA.</li><li><b>Politycy:</b> zgłoszenia z ustawy STOCK Act (Senat i Izba Reprezentantów).</li><li><b>Prezydent Trump:</b> formularze OGE 278-T, uporządkowane przez Open Cabinet. Dane są odczytywane automatycznie ze skanów, więc sprawdź źródło przed cytowaniem.</li></ul>
+<h2>Opóźnienia</h2><p>Form 4 spływa do 2 dni roboczych po transakcji, zgłoszenia polityków i prezydenta nawet do 45 dni, a raporty 13F do 45 dni po zakończeniu kwartału. Dlatego przy każdym wpisie widać datę transakcji, datę zgłoszenia i opóźnienie.</p>
+<h2>Kwoty w przedziałach</h2><p>Politycy podają wartości w przedziałach, np. 1 001 do 15 000 dolarów, nie w dokładnych sumach. Sortowanie po kwocie używa dolnej granicy przedziału.</p>
+<h2>Oznaczenia</h2><ul><li><b>Klaster:</b> co najmniej 3 różnych insiderów kupowało akcje tej samej spółki w ciągu 30 dni.</li><li><b>Możliwy duplikat:</b> identyczny wpis pojawił się wcześniej. Mógł to być błąd źródła albo dwie osobne transakcje, więc sprawdź dokument.</li></ul></div>`;
 
 function route(){
-  const h=location.hash.slice(1);
-  tab=T[h]?h:"";
-  $("#nav").innerHTML=Object.keys(T).map(k=>`<a href="#${k}" class="${k===tab?"on":""}">${T[k].name}</a>`).join("");
-  if(!tab){
-    $("#app").innerHTML=`<h1>Czyj ruch<br>chcesz zobaczyć?</h1><p class="sub">Jawne transakcje polityków, insiderów i funduszy z USA w jednym miejscu.</p><div class="grid">${Object.keys(T).map((k,i)=>`<a class="big" href="#${k}"><span class="num">0${i+1}</span><span><b>${T[k].name}</b><em>${T[k].desc}</em></span><span class="cnt">${D?D[k].length+" "+T[k].unit:""}<i>→</i></span></a>`).join("")}</div>`;
-    return;
-  }
-  $("#app").innerHTML=`<h1 class="pt">${T[tab].name}</h1><p class="sub">${T[tab].desc}.</p><div class="tools"><input type="search" id="q" placeholder="Szukaj spółki lub osoby" aria-label="Szukaj"><p class="note">${D?"Ostatnia aktualizacja: "+new Date(D.updated).toLocaleString("pl-PL"):""}</p></div><div id="out"></div>`;
-  $("#q").oninput=draw; draw(); window.scrollTo(0,0);
+  const h=location.hash.slice(1),m=h.match(/^t-([A-Za-z0-9-]+)$/);
+  P={q:"",t:"",c:"",r:"",s:-1,d:-1,n:50};
+  tab=T.includes(h)?h:"";
+  $("#nav").innerHTML=T.map(k=>`<a href="#${k}" class="${k===tab?"on":""}">${V[k].name}</a>`).join("")+`<a href="#about" class="${h==="about"?"on":""}">O projekcie</a>`;
+  const old=D&&days(D.updated.slice(0,10),TODAY)>=3?`<p class="warn">Dane mogą być nieaktualne: ostatnia aktualizacja ${dn(days(D.updated.slice(0,10),TODAY))} temu.</p>`:"";
+  let html,title="Insider Info";
+  if(h==="about"){html=about;title+=" | O projekcie"}
+  else if(m){html=old+company(m[1].toUpperCase());title+=" | "+m[1].toUpperCase()}
+  else if(tab){html=old+stale(tab==="funds"?"funds":tab)+`<h1 class="pt">${V[tab].name}</h1><p class="sub">${V[tab].desc}.</p><p class="note">${D?"Ostatnia aktualizacja: "+new Date(D.updated).toLocaleString("pl-PL"):""}</p>${controls(tab)}<div id="out"></div>`;title+=" | "+V[tab].name}
+  else html=old+home();
+  $("#app").innerHTML=html;document.title=title;draw();window.scrollTo(0,0);
 }
 
+$("#app").addEventListener("input",e=>{if(e.target.id==="q"){P.q=e.target.value;P.n=50;draw()}});
+$("#app").addEventListener("change",e=>{const k={ty:"t",ch:"c",rg:"r"}[e.target.id];if(k){P[k]=e.target.value;P.n=50;draw()}});
+$("#app").addEventListener("click",e=>{
+  const s=e.target.closest(".sb");
+  if(s){const i=+s.dataset.s;P.d=P.s===i?-P.d:-1;P.s=i;draw();return}
+  if(e.target.id==="mo"){P.n+=100;draw()}
+});
 addEventListener("hashchange",route);
 route();
-fetch("data.json").then(r=>r.json()).then(d=>{D=d;route()}).catch(()=>{$("#app").insertAdjacentHTML("beforeend",'<div class="empty">Nie udało się wczytać danych. Uruchom bota w zakładce Actions i odśwież stronę.</div>')});
+fetch("data.json").then(r=>r.json()).then(d=>{
+  D=d;
+  const buyers={};
+  D.insiders.filter(r=>isBuy(r.type)&&days(r.date,TODAY)<=30).forEach(r=>(buyers[r.ticker]=buyers[r.ticker]||new Set()).add(r.person));
+  CL=new Set(Object.keys(buyers).filter(t=>buyers[t].size>=3));
+  route();
+}).catch(()=>{$("#app").insertAdjacentHTML("beforeend",'<div class="empty">Nie udało się wczytać danych. Uruchom bota w zakładce Actions i odśwież stronę.</div>')});
 </script>
 </body>
 </html>
