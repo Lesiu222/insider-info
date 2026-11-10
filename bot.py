@@ -2,7 +2,7 @@ import json, os, sys, time, datetime as dt
 import xml.etree.ElementTree as ET
 import requests
 
-UA = {"User-Agent": "test"}  
+UA = {"User-Agent": "test"}  # w main() ustawiany z sekretu SEC_CONTACT
 
 # Spolki, ktorych insiderow (Form 4) sledzimy
 TICKERS = ["AAPL", "MSFT", "NVDA", "GOOGL", "AMZN", "META", "TSLA", "PLTR",
@@ -177,16 +177,53 @@ def funds():
 
 
 # ---------- Politycy (FMP) ----------
+FMP_URL = "https://financialmodelingprep.com/stable/"
+
+
 def fmp(ep, page, limit, key):
-    return requests.get(f"https://financialmodelingprep.com/stable/{ep}",
-                        params={"page": page, "limit": limit, "apikey": key}, timeout=30)
+    return requests.get(FMP_URL + ep, params={"page": page, "limit": limit, "apikey": key}, timeout=30)
 
 
-def politicians(key):
-    rows, count = [], {}
+def norm(chamber, d):
+    return {
+        "chamber": chamber, "name": f"{d.get('firstName', '')} {d.get('lastName', '')}".strip(),
+        "region": d.get("district", ""), "owner": d.get("owner", ""),
+        "ticker": d.get("symbol", ""), "asset": d.get("assetDescription", ""),
+        "type": d.get("type", ""), "amount": d.get("amount", ""),
+        "tx": d.get("transactionDate", ""), "disclosed": d.get("disclosureDate", ""),
+        "link": d.get("link", ""),
+    }
+
+
+def dedupe_key(r):
+    return "|".join(str(r[k]) for k in ("chamber", "name", "ticker", "type", "amount", "tx", "disclosed"))
+
+
+def combine(sources):
+    """Laczy listy z roznych zapytan bez podwajania tych samych transakcji."""
+    best = {}
+    for rows in sources:
+        groups = {}
+        for r in rows:
+            groups.setdefault(dedupe_key(r), []).append(r)
+        for k, lst in groups.items():
+            if k not in best or len(lst) > len(best[k]):
+                best[k] = lst
+    out = []
+    for k, lst in best.items():
+        for n, r in enumerate(lst):
+            r = dict(r)
+            r["id"] = f"{k}#{n}"
+            r["dup"] = n > 0  # identyczny wpis: moze byc duplikat API
+            out.append(r)
+    return out
+
+
+def latest(key):
+    rows = []
     for chamber, ep in (("Senat", "senate-latest"), ("Izba", "house-latest")):
         first, limit = None, None
-        for l in (100, 50, 25, 10, 5):  # plan FMP moze dopuszczac tylko male porcje
+        for l in (25, 10, 5):  # plan darmowy: limit maksymalnie 25
             r = fmp(ep, 0, l, key)
             print(ep, "limit", l, "status", r.status_code, "" if r.status_code == 200 else r.text[:150])
             if r.status_code == 200:
@@ -202,22 +239,32 @@ def politicians(key):
             data = r.json()
             if not data:
                 break
-            for d in data:
-                row = {
-                    "chamber": chamber, "name": f"{d.get('firstName', '')} {d.get('lastName', '')}".strip(),
-                    "region": d.get("district", ""), "owner": d.get("owner", ""),
-                    "ticker": d.get("symbol", ""), "asset": d.get("assetDescription", ""),
-                    "type": d.get("type", ""), "amount": d.get("amount", ""),
-                    "tx": d.get("transactionDate", ""), "disclosed": d.get("disclosureDate", ""),
-                    "link": d.get("link", ""),
-                }
-                k = "|".join(str(v) for v in row.values())
-                n = count.get(k, 0)
-                count[k] = n + 1
-                row["id"] = f"{k}#{n}"
-                row["dup"] = n > 0  # identyczny wpis: moze byc duplikat API
-                rows.append(row)
+            rows += [norm(chamber, d) for d in data]
     return rows
+
+
+def by_symbol(key):
+    """Transakcje polityków w spółkach z naszej listy (uzupelnia ostatnie 25 wpisow)."""
+    rows = []
+    for chamber, ep in (("Senat", "senate-trades"), ("Izba", "house-trades")):
+        for t in TICKERS:
+            time.sleep(0.2)
+            try:
+                r = requests.get(FMP_URL + ep, params={"symbol": t, "apikey": key}, timeout=30)
+            except requests.RequestException as e:
+                print(ep, t, e)
+                continue
+            if r.status_code != 200:
+                print(ep, t, "status", r.status_code, r.text[:100] if t == TICKERS[0] else "")
+                if r.status_code in (401, 402, 403):
+                    break  # plan tego nie dopuszcza, nie marnujemy zapytan
+                continue
+            rows += [norm(chamber, d) for d in r.json()]
+    return rows
+
+
+def politicians(key):
+    return combine([latest(key), by_symbol(key)])
 
 
 def main():
