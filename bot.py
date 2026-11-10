@@ -1,4 +1,4 @@
-import json, os, sys, time, datetime as dt
+import csv, io, json, os, re, sys, time, datetime as dt
 import xml.etree.ElementTree as ET
 import requests
 
@@ -7,13 +7,20 @@ UA = {"User-Agent": "test"}  # w main() ustawiany z sekretu SEC_CONTACT
 # Spolki, ktorych insiderow (Form 4) sledzimy
 TICKERS = ["AAPL", "MSFT", "NVDA", "GOOGL", "AMZN", "META", "TSLA", "PLTR",
            "AXP", "BAC", "KO", "CVX", "OXY", "JPM", "COIN", "MSTR",
-           "DJT", "LMT", "INTC", "LLY", "BRK-B"]
+           "DJT", "LMT", "INTC", "LLY", "BRK-B",
+           "NFLX", "AVGO", "ORCL", "AMD", "MU", "V", "MA", "GS", "BLK",
+           "HOOD", "XOM", "RTX", "NOC", "BA", "UNH", "PFE", "WMT", "COST",
+           "MCD", "DIS", "NKE", "SBUX", "CRWV", "CRCL", "KHC", "MCO"]
+
+# Zapytania o polityków per spolka zuzywaja limit FMP (250 dziennie), wiec tylko dla pierwszych 21
+POL_TICKERS = TICKERS[:21]
 
 # Fundusze (13F). Nazwa pochodzi z SEC, wiec zle CIK od razu widac na stronie
-FUNDS = [1067983, 1336528, 1697748, 921669]  # Berkshire, Pershing Square, ARK, Icahn
+# Berkshire, Pershing Square, ARK, Icahn, Bridgewater, Soros, Duquesne, Third Point
+FUNDS = [1067983, 1336528, 1697748, 921669, 1350694, 1029160, 1536411, 1040273]
 
 # Politycy wyrozniani (po nazwisku)
-VIP = ["Pelosi", "Khanna", "Gottheimer", "Tuberville"]
+VIP = ["Pelosi", "Khanna", "Gottheimer", "Tuberville", "Trump"]
 
 KEEP_DAYS = 365  # jak dlugo trzymamy archiwum
 
@@ -161,6 +168,9 @@ def funds():
             rec = get(f"https://data.sec.gov/submissions/CIK{cik:010d}.json").json()
             r = rec["filings"]["recent"]
             fl = [(a, rd, fd) for f, a, rd, fd in zip(r["form"], r["accessionNumber"], r["reportDate"], r["filingDate"]) if f == "13F-HR"]
+            if not fl:
+                print("fundusz", cik, "brak raportow 13F")
+                continue
             cur = holdings(cik, fl[0][0])
             prev = holdings(cik, fl[1][0]) if len(fl) > 1 else {}
             top = []
@@ -196,6 +206,8 @@ def norm(chamber, d):
 
 
 def dedupe_key(r):
+    if "rid" in r:
+        return r["rid"]
     return "|".join(str(r[k]) for k in ("chamber", "name", "ticker", "type", "amount", "tx", "disclosed"))
 
 
@@ -247,7 +259,7 @@ def by_symbol(key):
     """Transakcje polityków w spółkach z naszej listy (uzupelnia ostatnie 25 wpisow)."""
     rows = []
     for chamber, ep in (("Senat", "senate-trades"), ("Izba", "house-trades")):
-        for t in TICKERS:
+        for t in POL_TICKERS:
             time.sleep(0.2)
             try:
                 r = requests.get(FMP_URL + ep, params={"symbol": t, "apikey": key}, timeout=30)
@@ -255,7 +267,7 @@ def by_symbol(key):
                 print(ep, t, e)
                 continue
             if r.status_code != 200:
-                print(ep, t, "status", r.status_code, r.text[:100] if t == TICKERS[0] else "")
+                print(ep, t, "status", r.status_code, r.text[:100] if t == POL_TICKERS[0] else "")
                 if r.status_code in (401, 402, 403):
                     break  # plan tego nie dopuszcza, nie marnujemy zapytan
                 continue
@@ -263,8 +275,46 @@ def by_symbol(key):
     return rows
 
 
-def politicians(key):
-    return combine([latest(key), by_symbol(key)])
+# ---------- Prezydent Trump (OGE 278-T, dane z Open Cabinet) ----------
+TRUMP_URL = "https://open-cabinet.vercel.app/data/all-transactions.csv"
+TRUMP_MAX = 200  # najnowsze transakcje, zeby nie zdominowaly listy polityków
+
+
+def filing_date(url, fallback):
+    m = re.search(r"(\d{2})\.(\d{2})\.(\d{4}|\d{2})(?!\d)", url or "")
+    if m:
+        mo, d, y = m.groups()
+        return f"{y if len(y) == 4 else '20' + y}-{mo}-{d}"
+    return fallback
+
+
+def trump_rows():
+    r = requests.get(TRUMP_URL, headers=UA, timeout=120)
+    r.raise_for_status()
+    text = r.text
+    while text.startswith("#"):
+        text = text.split("\n", 1)[1]
+    out = []
+    for d in csv.DictReader(io.StringIO(text)):
+        name = d.get("official_name", "").lower()
+        if "trump" not in name or "donald" not in name:
+            continue
+        if d.get("source_kind") != "278-T" or d.get("type") not in ("Purchase", "Sale"):
+            continue
+        if d.get("instrument_type") not in ("common_stock", "etf") or d.get("verificationState", "").startswith("under"):
+            continue
+        tk = d.get("resolved_ticker") or d.get("ticker")
+        if not tk or not d.get("date"):
+            continue
+        out.append({
+            "chamber": "Prezydent", "name": "Donald J. Trump", "region": "", "owner": "",
+            "ticker": tk, "asset": d.get("description", ""), "type": d["type"],
+            "amount": d.get("amount_range", ""), "tx": d["date"],
+            "disclosed": filing_date(d.get("source_filing_url"), d["date"]),
+            "link": d.get("source_filing_url", ""), "rid": d.get("recordId", ""),
+        })
+    out.sort(key=lambda r: (r["tx"], r["rid"]), reverse=True)
+    return out[:TRUMP_MAX]
 
 
 def main():
@@ -278,25 +328,32 @@ def main():
     failed = []
     data = {"updated": now, "watch": TICKERS, "vip": VIP, "fresh": dict(old.get("fresh", {}))}
 
-    # politycy (mozna wylaczyc zmienna POLITICIANS_ENABLED=0)
+    # politycy: FMP (mozna wylaczyc POLITICIANS_ENABLED=0) i Trump (OGE)
     key = os.environ.get("FMP_API_KEY")
-    if os.environ.get("POLITICIANS_ENABLED", "1") == "0":
-        data["politicians"] = []
-    elif not key:
-        print("Brak FMP_API_KEY")
-        data["politicians"] = old.get("politicians", [])
-        failed.append("politicians")
-    else:
+    fmp_on = os.environ.get("POLITICIANS_ENABLED", "1") != "0"
+    old_pol = old.get("politicians", [])
+    sources = []
+    if not fmp_on:
+        old_pol = [r for r in old_pol if r.get("chamber") == "Prezydent"]
+    elif key:
         try:
-            new = politicians(key)
+            sources += [latest(key), by_symbol(key)]
         except Exception as e:
-            print("politycy:", e)
-            new = []
-        if new:
-            data["fresh"]["politicians"] = now
-        else:
-            failed.append("politicians")
-        data["politicians"] = merge(old.get("politicians", []), new, lambda r: r["disclosed"], lambda r: r["disclosed"])
+            print("FMP:", e)
+    else:
+        print("Brak FMP_API_KEY")
+        failed.append("politicians")
+    try:
+        sources.append(trump_rows())
+    except Exception as e:
+        print("Trump:", e)
+        failed.append("trump")
+    new = combine(sources)
+    if fmp_on and key and not any(r["chamber"] != "Prezydent" for r in new):
+        failed.append("politicians")
+    if new:
+        data["fresh"]["politicians"] = now
+    data["politicians"] = merge(combine([old_pol]), new, lambda r: r["disclosed"], lambda r: r["disclosed"])
 
     # insiderzy
     seen_old = set(old.get("seen", []))
