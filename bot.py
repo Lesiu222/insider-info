@@ -95,7 +95,7 @@ def parse4(xml, ticker, filed, link):
         sh = num(txt(x, "transactionAmounts/transactionShares/value"))
         px = num(txt(x, "transactionAmounts/transactionPricePerShare/value"))
         out.append({
-            "id": f"{link}#{i}", "ticker": ticker, "person": who, "role": role,
+            "id": f"{link}#{i}", "ticker": ticker, "issuer": txt(root, "issuer/issuerName"), "person": who, "role": role,
             "type": "Purchase" if code == "P" else "Sale",
             "date": txt(x, "transactionDate/value"), "filed": filed,
             "shares": sh, "price": px, "value": round(sh * px), "link": link,
