@@ -11,7 +11,7 @@
 <meta property="og:type" content="website">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23f5c518'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0a0a0a;--text:#f2f2f0;--dim:#82827e;--line:#232321;--y:#f5c518;--buy:#7fc794;--sell:#e0705f}
 *{box-sizing:border-box}
@@ -114,14 +114,41 @@ footer{max-width:1100px;margin:0 auto;padding:20px 24px 48px;color:var(--dim);fo
 @media(max-width:900px){.tag{display:none}}
 @media(max-width:1000px){.hm .intro{flex-direction:column;align-items:flex-start;gap:20px}.hm h1{font-size:42px}.hm .dash{grid-template-columns:minmax(0,1fr)}.hm .side{flex-direction:row;align-items:flex-start}.hm .pn{flex:1}.hm .card{min-height:218px}}
 @media(max-width:600px){.hm .intro{align-items:stretch}.hm .primary{width:100%;min-height:44px}.hm .cats{grid-template-columns:minmax(0,1fr);gap:12px}.hm .card{padding:20px;gap:8px;min-height:0}.hm .fd{padding:20px}.hm .th{display:none}.hm .tr{grid-template-columns:20% minmax(0,1fr);gap:12px;padding:20px 0}.hm .tr .sell,.hm .tr .buy{grid-column:1}.hm .tr .val{grid-column:2}.hm .side{flex-direction:column}.hm .pn{width:100%;flex:auto}.hm h1{font-size:34px}}
+input.hs{flex:1;max-width:340px;min-width:0;margin-left:20px;padding:8px 12px}
+.live{display:flex;align-items:center;gap:8px;font:12px "JetBrains Mono",ui-monospace,monospace;color:var(--dim);border:1px solid var(--line);border-radius:8px;padding:6px 10px;white-space:nowrap}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--buy);animation:pl 2s infinite}
+@keyframes pl{50%{opacity:.35}}
+.tape{overflow:hidden;border-bottom:1px solid var(--line);background:#0d0d0c}
+.tape-in{display:flex;width:max-content;gap:32px;padding:8px 0;animation:tp 90s linear infinite}
+.tape:hover .tape-in{animation-play-state:paused}
+@keyframes tp{to{transform:translateX(-50%)}}
+.ti{display:flex;gap:8px;align-items:center;font-size:12px;white-space:nowrap}
+.ti b,.ti .buy,.ti .sell{font-family:"JetBrains Mono",ui-monospace,monospace}
+.ti .buy,.ti .sell{font-weight:500}
+td.n,.metric,.val,.pur span:last-child,.kpi b{font-family:"JetBrains Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+.sm{display:block;font-size:12px;color:var(--dim);font-weight:400}
+.seg{display:flex;border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px}
+.seg button{background:none;border:0;color:var(--dim);font:inherit;padding:6px 12px;border-radius:7px;cursor:pointer}
+.seg button.on{background:#1c1c1a;color:var(--text)}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.kpi{padding:20px;border:1px solid var(--line);border-radius:12px;background:#111110}
+.kpi h3{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);font-weight:500;margin:0 0 12px}
+.kpi b{display:block;font-size:26px;font-weight:600}.kpi p{margin:8px 0 0;color:var(--dim);font-size:12px}
+.chartp{border:1px solid var(--line);border-radius:12px;padding:24px}
+.ch{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:12px}
+@media(max-width:900px){input.hs,.live{display:none}}
+@media(max-width:1000px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.kpis{grid-template-columns:1fr}.chartp{padding:16px}}
+@media(prefers-reduced-motion:reduce){.tape-in,.dot{animation:none}.tape{overflow-x:auto}}
 </style>
 </head>
 <body>
 <header><div class="hd">
   <a class="logo" href="#" aria-label="Insider Info, strona główna"><span class="mark"></span>Insider Info</a>
-  <span class="tag">JAWNE DANE. LEPSZY KONTEKST.</span>
+  <input class="hs" id="hs" type="search" placeholder="Szukaj tickera lub osoby, Enter" aria-label="Szukaj w całym serwisie"><span class="live" id="live"></span>
   <nav id="nav"></nav>
 </div></header>
+<div class="tape" id="tape" aria-hidden="true"></div>
 <main id="app"></main>
 <footer><p class="ft">PUBLICZNE ŹRÓDŁA. ŚWIADOME DECYZJE.</p>To materiał informacyjny, nie rekomendacja inwestycyjna. Zgłoszenia mają opóźnienie: Form 4 do 2 dni, polityków do 45 dni, 13F do 45 dni po kwartale. Kwoty polityków podawane są w przedziałach. Dane o transakcjach prezydenta Trumpa pochodzą z formularzy OGE 278-T, w wersji uporządkowanej przez <a href="https://open-cabinet.vercel.app" target="_blank" rel="noopener">Open Cabinet</a>. <a href="#about">O projekcie</a></footer>
 <script>
@@ -140,14 +167,14 @@ const amt=s=>+String(s||"").replace(/[^0-9-]/g,"").split("-")[0]||0;
 const own={Spouse:"Małżonek",Joint:"Wspólne","Dependent Child":"Dziecko","":"Własne"};
 const lnk=u=>/^https:\/\//.test(u||"")?`<a href="${esc(u)}" target="_blank" rel="noopener">źródło</a>`:"";
 const T=["politicians","insiders","funds"];
-let D=null,tab="",CL=new Set(),P={};
+let D=null,tab="",CL=new Set(),P={},Q0="";
 
 const V={
  politicians:{name:"Politycy",desc:"Transakcje senatorów, posłów i prezydenta USA",unit:"transakcji",date:r=>r.tx,
   cols:[["Zgłoszono",r=>fd(r.disclosed),r=>r.disclosed],["Transakcja",r=>fd(r.tx),r=>r.tx],["Opóźnienie",r=>dn(days(r.tx,r.disclosed)),r=>days(r.tx,r.disclosed),1],["Izba",r=>esc(r.chamber),r=>r.chamber],["Polityk",r=>esc(r.name)+(r.region?` (${esc(r.region)})`:""),r=>r.name],["Spółka",r=>tk(r.ticker),r=>r.ticker],["Typ",r=>tp(r.type),r=>r.type],["Kwota",r=>esc(r.amount),r=>amt(r.amount),1],["Właściciel",r=>own[r.owner]??esc(r.owner),r=>r.owner],["",r=>lnk(r.link)+(r.dup?' <span class="note" title="Identyczny wpis pojawił się wcześniej. Sprawdź w źródle.">możliwy duplikat</span>':"")]],
   text:r=>`${r.name} ${r.ticker} ${r.asset}`},
  insiders:{name:"Insiderzy",desc:"Zakupy i sprzedaże zarządów i dyrektorów spółek",unit:"transakcji",date:r=>r.date,
-  cols:[["Złożono",r=>fd(r.filed),r=>r.filed],["Transakcja",r=>fd(r.date),r=>r.date],["Opóźnienie",r=>dn(days(r.date,r.filed)),r=>days(r.date,r.filed),1],["Spółka",r=>tk(r.ticker)+(CL.has(r.ticker)&&isBuy(r.type)?' <span class="chip" title="Co najmniej 3 różnych insiderów kupowało w ciągu 30 dni">klaster</span>':""),r=>r.ticker],["Osoba",r=>esc(r.person),r=>r.person],["Rola",r=>esc(r.role),r=>r.role],["Typ",r=>tp(r.type),r=>r.type],["Akcje",r=>Math.round(r.shares).toLocaleString("pl-PL"),r=>r.shares,1],["Cena",r=>r.price?"$"+r.price.toFixed(2):"",r=>r.price,1],["Wartość",r=>usd(r.value),r=>r.value,1],["",r=>lnk(r.link)]],
+  cols:[["Złożono",r=>fd(r.filed),r=>r.filed],["Transakcja",r=>fd(r.date),r=>r.date],["Opóźnienie",r=>dn(days(r.date,r.filed)),r=>days(r.date,r.filed),1],["Spółka",r=>tk(r.ticker)+(CL.has(r.ticker)&&isBuy(r.type)?' <span class="chip" title="Co najmniej 3 różnych insiderów kupowało w ciągu 30 dni">klaster</span>':"")+(r.issuer?`<small class="sm">${esc(r.issuer)}</small>`:""),r=>r.ticker],["Osoba",r=>esc(r.person),r=>r.person],["Rola",r=>esc(r.role),r=>r.role],["Typ",r=>tp(r.type),r=>r.type],["Wartość",r=>`<span class="${isBuy(r.type)?"buy":"sell"}">${isBuy(r.type)?"+":"−"}${mln(r.value)}</span><small class="sm">${Math.round(r.shares).toLocaleString("pl-PL")} akcji · $${(r.price||0).toFixed(2)}</small>`,r=>r.value,1],["",r=>lnk(r.link)]],
   text:r=>`${r.person} ${r.ticker}`},
  funds:{name:"Fundusze",desc:"Portfele największych funduszy z raportów 13F",unit:"funduszy"}
 };
@@ -187,7 +214,7 @@ function draw(){
 
 function controls(k){
   if(k==="funds") return '<div class="tools"><input type="search" id="q" placeholder="Szukaj funduszu lub spółki" aria-label="Szukaj"></div>';
-  return `<div class="tools"><input type="search" id="q" placeholder="Szukaj spółki lub osoby" aria-label="Szukaj"><select id="ty" aria-label="Typ"><option value="">Kupno i sprzedaż</option><option value="b">Tylko kupno</option><option value="s">Tylko sprzedaż</option></select><select id="rg" aria-label="Okres"><option value="">Cały okres</option><option value="7">Ostatnie 7 dni</option><option value="30">Ostatnie 30 dni</option><option value="90">Ostatnie 90 dni</option></select>${k==="politicians"?'<select id="ch" aria-label="Izba"><option value="">Wszyscy</option><option>Senat</option><option>Izba</option><option>Prezydent</option></select>':""}</div>`;
+  return `<div class="tools"><input type="search" id="q" placeholder="Szukaj spółki lub osoby" aria-label="Szukaj">${seg()}<select id="rg" aria-label="Okres"><option value="">Cały okres</option><option value="7">Ostatnie 7 dni</option><option value="30">Ostatnie 30 dni</option><option value="90">Ostatnie 90 dni</option></select>${k==="politicians"?'<select id="ch" aria-label="Izba"><option value="">Wszyscy</option><option>Senat</option><option>Izba</option><option>Prezydent</option></select>':""}</div>`;
 }
 
 function home(){
@@ -201,8 +228,15 @@ function home(){
   const src={politicians:"STOCK Act · do 45 dni",insiders:"SEC Form 4 · do 2 dni",funds:"SEC 13F · raport kwartalny"};
   const desc={politicians:"Senatorowie, posłowie i prezydent USA",insiders:"Zarządy i dyrektorzy spółek",funds:"Portfele największych funduszy"};
   const cap=D?`Stan danych: ${fd(D.updated.slice(0,10))}, ${D.updated.slice(11,16)} UTC / Dane publiczne z SEC, STOCK Act i OGE`:"Wczytywanie danych";
+  let kpi="",chart="";
+  if(D){
+    const I=D.insiders.filter(r=>r.date&&r.date<=TODAY&&days(r.date,TODAY)<=30),B=I.filter(r=>isBuy(r.type)),S=I.filter(r=>isSell(r.type));
+    const bv=B.reduce((a,r)=>a+r.value,0),sv=S.reduce((a,r)=>a+r.value,0),ratio=sv?bv/sv:0,lag=I.length?I.reduce((a,r)=>a+days(r.date,r.filed),0)/I.length:0;
+    kpi=`<section class="kpis" aria-label="Wskaźniki z 30 dni"><div class="kpi"><h3>Wartość zakupów · 30 dni</h3><b class="buy">${mln(bv)}</b><p>${B.length} transakcji kupna</p></div><div class="kpi"><h3>Wartość sprzedaży · 30 dni</h3><b class="sell">${mln(sv)}</b><p>${S.length} transakcji sprzedaży</p></div><div class="kpi"><h3>Stosunek kupno do sprzedaży</h3><b>${ratio.toFixed(2).replace(".",",")}</b><p>${ratio<1?"przewaga sprzedających":"przewaga kupujących"}</p></div><div class="kpi"><h3>Średnie opóźnienie zgłoszenia</h3><b>${lag.toFixed(1).replace(".",",")} dni</b><p>${I.length} przeanalizowanych transakcji</p></div></section>`;
+    chart=`<section class="chartp"><div class="ch"><div><h2>Przepływ kapitału</h2><p class="cap">Dzienna wartość transakcji insiderów, ostatnie 30 dni (mln USD)</p></div><p class="cap"><span class="buy">■ Kupno</span> &nbsp; <span class="sell">■ Sprzedaż</span></p></div>${flow(I)}</section>`;
+  }
   const row=r=>{const u=/^https:\/\//.test(r.link||"");return `<a class="tr" href="${u?esc(r.link):"#insiders"}"${u?' target="_blank" rel="noopener"':""}><strong class="tkr">${esc(r.ticker)}</strong><span class="per">${esc(r.person)}<small>${fd(r.date)}</small></span>${isBuy(r.type)?'<span class="buy">Kupno</span>':'<span class="sell">Sprzedaż</span>'}<span class="val">${usd(r.value)}</span></a>`};
-  return `<div class="hm"><section class="intro"><div class="ic"><p class="eyebrow">RYNEK USA / PRZEGLĄD</p><h1>Zobacz, kto wykonuje ruch.</h1><p class="subtitle">Transakcje polityków, insiderów i funduszy. Bez szumu, w jednym miejscu.</p></div><a class="button primary" href="#politicians">Otwórz pełną bazę</a></section><p class="cap">${cap}</p><nav class="cats" aria-label="Źródła danych">${T.map(k=>`<a class="card" href="#${k}"><h2>${V[k].name}</h2><span class="metric">${D?D[k].length.toLocaleString("pl-PL"):"..."}</span><p class="desc">${desc[k]}</p><span class="source">${src[k]}</span></a>`).join("")}</nav><div class="dash"><section class="fd"><h2>Ostatnie transakcje insiderów</h2><p class="cap" style="margin-top:4px">Data transakcji i wartość zgłoszenia. Kliknij wpis, aby sprawdzić SEC.</p><div class="th" aria-hidden="true"><span>SPÓŁKA</span><span>OSOBA / DATA</span><span>TYP</span><span class="val">WARTOŚĆ</span></div>${ins.map(row).join("")}<a class="button" style="margin-top:16px" href="#insiders">Wszystkie transakcje insiderów</a></section><aside class="side"><section class="pn pop"><h2>Najczęściej kupowane</h2><p class="cap">Liczba transakcji · ostatnie 30 dni</p>${top.map(([t,n])=>`<a class="pur" href="#t-${esc(t)}"><span>${esc(t)}</span><span>${n}</span></a>`).join("")||'<span class="dim">Brak danych</span>'}</section><section class="pn"><h2>Dane to nie sygnał.</h2><p class="ctx">Zgłoszenia są publikowane z opóźnieniem. Data transakcji nie jest datą ujawnienia, a kwoty polityków są podawane w przedziałach.</p></section></aside></div></div>`;
+  return `<div class="hm"><section class="intro"><div class="ic"><p class="eyebrow">RYNEK USA / PRZEGLĄD</p><h1>Zobacz, kto wykonuje ruch.</h1><p class="subtitle">Transakcje polityków, insiderów i funduszy. Bez szumu, w jednym miejscu.</p></div><a class="button primary" href="#politicians">Otwórz pełną bazę</a></section><p class="cap">${cap}</p><nav class="cats" aria-label="Źródła danych">${T.map(k=>`<a class="card" href="#${k}"><h2>${V[k].name}</h2><span class="metric">${D?D[k].length.toLocaleString("pl-PL"):"..."}</span><p class="desc">${desc[k]}</p><span class="source">${src[k]}</span></a>`).join("")}</nav>${kpi}${chart}<div class="dash"><section class="fd"><h2>Ostatnie transakcje insiderów</h2><p class="cap" style="margin-top:4px">Data transakcji i wartość zgłoszenia. Kliknij wpis, aby sprawdzić SEC.</p><div class="th" aria-hidden="true"><span>SPÓŁKA</span><span>OSOBA / DATA</span><span>TYP</span><span class="val">WARTOŚĆ</span></div>${ins.map(row).join("")}<a class="button" style="margin-top:16px" href="#insiders">Wszystkie transakcje insiderów</a></section><aside class="side"><section class="pn pop"><h2>Najczęściej kupowane</h2><p class="cap">Liczba transakcji · ostatnie 30 dni</p>${top.map(([t,n])=>`<a class="pur" href="#t-${esc(t)}"><span>${esc(t)}</span><span>${n}</span></a>`).join("")||'<span class="dim">Brak danych</span>'}</section><section class="pn"><h2>Dane to nie sygnał.</h2><p class="ctx">Zgłoszenia są publikowane z opóźnieniem. Data transakcji nie jest datą ujawnienia, a kwoty polityków są podawane w przedziałach.</p></section></aside></div></div>`;
 }
 
 function company(t){
@@ -220,9 +254,34 @@ const about=`<h1 class="pt">O projekcie</h1><div class="about"><p class="sub">In
 <h2>Kwoty w przedziałach</h2><p>Politycy podają wartości w przedziałach, np. 1 001 do 15 000 dolarów, nie w dokładnych sumach. Sortowanie po kwocie używa dolnej granicy przedziału.</p>
 <h2>Oznaczenia</h2><ul><li><b>Klaster:</b> co najmniej 3 różnych insiderów kupowało akcje tej samej spółki w ciągu 30 dni.</li><li><b>Możliwy duplikat:</b> identyczny wpis pojawił się wcześniej. Mógł to być błąd źródła albo dwie osobne transakcje, więc sprawdź dokument.</li></ul></div>`;
 
+const mln=n=>n>=1e9?"$"+(n/1e9).toFixed(2).replace(".",",")+" mld":n>=1e6?"$"+(n/1e6).toFixed(2).replace(".",",")+" mln":n>=1e3?"$"+Math.round(n/1e3)+" tys.":"$"+Math.round(n||0);
+const seg=()=>`<div class="seg" role="group" aria-label="Typ transakcji">${[["","Wszystko"],["b","Kupno"],["s","Sprzedaż"]].map(([v,l])=>`<button data-ty="${v}" class="${P.t===v?"on":""}">${l}</button>`).join("")}</div>`;
+
+function flow(rows){
+  const N=30,buy={},sell={};
+  rows.forEach(r=>{const m=isBuy(r.type)?buy:sell;m[r.date]=(m[r.date]||0)+r.value});
+  const ds=[...Array(N)].map((_,i)=>{const d=new Date(Date.now()-(N-1-i)*864e5).toISOString().slice(0,10);return[d,buy[d]||0,sell[d]||0]});
+  const mx=Math.max(1,...ds.map(d=>Math.max(d[1],d[2]))),W=760,H=230,L=44,B=24,T=8,cw=(W-L)/N,bw=cw*.36,ph=H-B-T,y=v=>T+ph-v/mx*ph;
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Dzienna wartość zakupów i sprzedaży insiderów">`;
+  [0,.5,1].forEach(k=>{const v=mx*k;s+=`<line x1="${L}" x2="${W}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)" stroke-dasharray="3 3"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end" font-size="10" fill="var(--dim)" font-family="JetBrains Mono,monospace">${Math.round(v/1e6)}</text>`});
+  ds.forEach((d,i)=>{const x=L+i*cw+cw*.14;
+    if(d[1])s+=`<rect x="${x}" y="${y(d[1])}" width="${bw}" height="${T+ph-y(d[1])}" fill="var(--buy)" rx="1"><title>${fd(d[0])} kupno ${mln(d[1])}</title></rect>`;
+    if(d[2])s+=`<rect x="${x+bw+1}" y="${y(d[2])}" width="${bw}" height="${T+ph-y(d[2])}" fill="var(--sell)" rx="1"><title>${fd(d[0])} sprzedaż ${mln(d[2])}</title></rect>`;
+    if(i%5===0)s+=`<text x="${x+bw}" y="${H-6}" text-anchor="middle" font-size="10" fill="var(--dim)" font-family="JetBrains Mono,monospace">${fd(d[0]).slice(0,5)}</text>`});
+  return s+"</svg>";
+}
+
+function buildTape(){
+  const L=D.insiders.filter(r=>r.date<=TODAY).slice(0,24);
+  if(!L.length) return;
+  const t=L.map(r=>`<span class="ti"><b>${esc(r.ticker)}</b><span class="${isBuy(r.type)?"buy":"sell"}">${isBuy(r.type)?"▲ KUPNO":"▼ SPRZEDAŻ"} ${mln(r.value)}</span><span class="dim">${esc(r.person)}</span></span>`).join("");
+  $("#tape").innerHTML=`<div class="tape-in">${t}${t}</div>`;
+}
+function live(){$("#live").innerHTML=`<i class="dot"></i>SEC EDGAR · ${fd(D.updated.slice(0,10))} ${D.updated.slice(11,16)} UTC`}
+
 function route(){
   const h=location.hash.slice(1),m=h.match(/^t-([A-Za-z0-9-]+)$/);
-  P={q:"",t:"",c:"",r:"",s:-1,d:-1,n:50};
+  P={q:Q0,t:"",c:"",r:"",s:-1,d:-1,n:50};Q0="";
   tab=T.includes(h)?h:"";
   $("#nav").innerHTML=T.map(k=>`<a href="#${k}" class="${k===tab?"on":""}">${V[k].name}</a>`).join("")+`<a href="#about" class="${h==="about"?"on":""}">O projekcie</a>`;
   const old=D&&days(D.updated.slice(0,10),TODAY)>=3?`<p class="warn">Dane mogą być nieaktualne: ostatnia aktualizacja ${dn(days(D.updated.slice(0,10),TODAY))} temu.</p>`:"";
@@ -231,24 +290,35 @@ function route(){
   else if(m){html=old+company(m[1].toUpperCase());title+=" | "+m[1].toUpperCase()}
   else if(tab){html=old+stale(tab==="funds"?"funds":tab)+`<h1 class="pt">${V[tab].name}</h1><p class="sub">${V[tab].desc}.</p><p class="note">${D?"Ostatnia aktualizacja: "+new Date(D.updated).toLocaleString("pl-PL"):""}</p>${controls(tab)}<div id="out"></div>`;title+=" | "+V[tab].name}
   else{html=old+home();title+=" | przegląd transakcji"}
-  $("#app").innerHTML=html;document.title=title;draw();window.scrollTo(0,0);
+  $("#app").innerHTML=html;if($("#q"))$("#q").value=P.q;document.title=title;draw();window.scrollTo(0,0);
 }
 
 $("#app").addEventListener("input",e=>{if(e.target.id==="q"){P.q=e.target.value;P.n=50;draw()}});
 $("#app").addEventListener("change",e=>{const k={ty:"t",ch:"c",rg:"r"}[e.target.id];if(k){P[k]=e.target.value;P.n=50;draw()}});
 $("#app").addEventListener("click",e=>{
+  const sg=e.target.closest("[data-ty]");
+  if(sg){P.t=sg.dataset.ty;P.n=50;document.querySelectorAll("[data-ty]").forEach(b=>b.classList.toggle("on",b===sg));draw();return}
   const s=e.target.closest(".sb");
   if(s){const i=+s.dataset.s;P.d=P.s===i?-P.d:-1;P.s=i;draw();return}
   if(e.target.id==="mo"){P.n+=100;draw()}
 });
 addEventListener("hashchange",route);
+$("#hs").addEventListener("keydown",e=>{
+  if(e.key!=="Enter") return;
+  const v=e.target.value.trim(),u=v.toUpperCase();
+  if(!v||!D) return;
+  e.target.value="";
+  if([...D.insiders,...D.politicians].some(r=>r.ticker===u)){location.hash="#t-"+u;return}
+  Q0=v;
+  if(location.hash==="#insiders") route(); else location.hash="#insiders";
+});
 route();
 fetch("data.json").then(r=>r.json()).then(d=>{
   D=d;
   const buyers={};
   D.insiders.filter(r=>isBuy(r.type)&&days(r.date,TODAY)<=30).forEach(r=>(buyers[r.ticker]=buyers[r.ticker]||new Set()).add(r.person));
   CL=new Set(Object.keys(buyers).filter(t=>buyers[t].size>=3));
-  route();
+  buildTape();live();route();
 }).catch(()=>{$("#app").insertAdjacentHTML("beforeend",'<div class="empty">Nie udało się wczytać danych. Uruchom bota w zakładce Actions i odśwież stronę.</div>')});
 </script>
 </body>
